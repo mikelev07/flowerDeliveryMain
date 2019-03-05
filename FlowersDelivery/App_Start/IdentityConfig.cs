@@ -82,6 +82,77 @@ namespace FlowersDelivery
             }
             return manager;
         }
+
+        /// <summary>
+        /// Method to add user to multiple roles
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="roles">list of role names</param>
+        /// <returns></returns>
+        public virtual async Task<IdentityResult> AddUserToRolesAsync(string userId, IList<string> roles)
+        {
+            var userRoleStore = (IUserRoleStore<ApplicationUser, string>)Store;
+
+            var user = await FindByIdAsync(userId).ConfigureAwait(false);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid user Id");
+            }
+
+            var userRoles = await userRoleStore.GetRolesAsync(user).ConfigureAwait(false);
+            // Add user to each role using UserRoleStore
+            foreach (var role in roles.Where(role => !userRoles.Contains(role)))
+            {
+                await userRoleStore.AddToRoleAsync(user, role).ConfigureAwait(false);
+            }
+
+            // Call update once when all roles are added
+            return await UpdateAsync(user).ConfigureAwait(false);
+        }
+
+        /// <summary>
+        /// Remove user from multiple roles
+        /// </summary>
+        /// <param name="userId">user id</param>
+        /// <param name="roles">list of role names</param>
+        /// <returns></returns>
+        public virtual async Task<IdentityResult> RemoveUserFromRolesAsync(string userId, IList<string> roles)
+        {
+            var userRoleStore = (IUserRoleStore<ApplicationUser, string>)Store;
+
+            var user = await FindByIdAsync(userId).ConfigureAwait(false);
+            if (user == null)
+            {
+                throw new InvalidOperationException("Invalid user Id");
+            }
+
+            var userRoles = await userRoleStore.GetRolesAsync(user).ConfigureAwait(false);
+            // Remove user to each role using UserRoleStore
+            foreach (var role in roles.Where(userRoles.Contains))
+            {
+                await userRoleStore.RemoveFromRoleAsync(user, role).ConfigureAwait(false);
+            }
+
+            // Call update once when all roles are removed
+            return await UpdateAsync(user).ConfigureAwait(false);
+        }
+
+
+    }
+
+    public class ApplicationRoleManager : RoleManager<IdentityRole>
+    {
+        public ApplicationRoleManager(IRoleStore<IdentityRole, string> roleStore)
+            : base(roleStore)
+        {
+        }
+
+        public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
+        {
+            var manager = new ApplicationRoleManager(new RoleStore<IdentityRole>(context.Get<ApplicationDbContext>()));
+
+            return manager;
+        }
     }
 
     // Настройка диспетчера входа для приложения.

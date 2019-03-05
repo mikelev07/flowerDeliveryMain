@@ -13,7 +13,7 @@ namespace FlowersDelivery.Models
         {
             public string Id { get; set; }
             [Required(AllowEmptyStrings = false)]
-            [Display(Name = "RoleName")]
+            [Display(Name = "Имя роли")]
             public string Name { get; set; }
         }
 
@@ -22,7 +22,7 @@ namespace FlowersDelivery.Models
             public string Id { get; set; }
 
             [Required(AllowEmptyStrings = false)]
-            [Display(Name = "Email")]
+            [Display(Name = "Почта")]
             [EmailAddress]
             public string Email { get; set; }
 
