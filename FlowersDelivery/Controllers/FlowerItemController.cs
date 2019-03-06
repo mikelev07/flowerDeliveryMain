@@ -60,6 +60,10 @@ namespace FlowersDelivery.Controllers
 
             int pageSize = 3;
             int pageNumber = (page ?? 1);
+
+            //для списка категорий
+            ViewBag.Categories = new MultiSelectList(db.Categories,"Id", "Name");
+
             return View(items.ToPagedList(pageNumber, pageSize));
         }
 
@@ -82,7 +86,7 @@ namespace FlowersDelivery.Controllers
         // GET: FlowerItem/Create
         public ActionResult Create()
         {
-            ViewBag.CategoryId = new SelectList(db.Catagories, "Id", "Name");
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name");
             return View();
         }
 
@@ -100,7 +104,7 @@ namespace FlowersDelivery.Controllers
                 return RedirectToAction("Index");
             }
 
-            ViewBag.CategoryId = new SelectList(db.Catagories, "Id", "Name", flowerItem.CategoryId);
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", flowerItem.CategoryId);
 
             return View(flowerItem);
         }
@@ -117,7 +121,7 @@ namespace FlowersDelivery.Controllers
             {
                 return HttpNotFound();
             }
-            ViewBag.CategoryId = new SelectList(db.Catagories, "Id", "Name", flowerItem.CategoryId);
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", flowerItem.CategoryId);
             return View(flowerItem);
         }
 
@@ -134,7 +138,7 @@ namespace FlowersDelivery.Controllers
                 await db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewBag.CategoryId = new SelectList(db.Catagories, "Id", "Name", flowerItem.CategoryId);
+            ViewBag.CategoryId = new SelectList(db.Categories, "Id", "Name", flowerItem.CategoryId);
             return View(flowerItem);
         }
 
